@@ -1,0 +1,49 @@
+---------
+-- TIM --
+---------
+
+subdesign tim
+(
+	clk						: input;
+	res						: input;
+	cfg			[6..0]		: input;
+
+	clk_pll					: output;
+	clk_cog					: output;
+)
+
+variable
+
+	cfgx	[6..0]			: dff;
+	divide	[12..0]			: dff;
+
+begin
+
+	cfgx[].clk				= clk;
+	cfgx[].d				= cfg[];
+
+	case cfgx[].q == b"11xx111" is
+		when 1				=> clk_pll = clk;
+		when 0				=> clk_pll = divide[11].q;
+	end case;
+
+	divide[].clk			= clk;
+	divide[].d				= divide[].q + (
+								 cfgx[].q == b"11xx111" # res,
+								 cfgx[].q == b"11xx110" & !res,
+								 cfgx[].q == b"11xx101" & !res,
+								(cfgx[].q == b"11xx100" # cfgx[].q == b"xxxx000") & !res,
+								(cfgx[].q == b"11xx011" # cfgx[].q == b"x1xx010") & !res,
+								 b"0",
+								 b"0",
+								 b"0",
+								 b"0",
+								 b"0",
+								 b"0",
+								 b"0",
+								 cfgx[].q == b"xxxx001" & !res
+							  );
+
+	clk_cog					= divide[12].q;
+
+end;

@@ -1,0 +1,73 @@
+---------
+-- TOP --
+---------
+
+include "altpll.inc";		-- main clock pll, outputs 160MHz
+include "tim.inc";			-- clock generator, outputs 80MHz..20KHz cog clock, plus 2x CTRA/CTRB PLL simulator clock
+include "dig.inc";			-- digital core of P8X32A
+
+subdesign top
+(
+	clock_50		: input;		-- clock input
+
+	inp_resn		: input;		-- reset pin
+	
+	io		[31..0]	: bidir;		-- i/o pins
+
+	ledg	[7..0]	: output;		-- cog leds
+)
+
+variable
+
+	pll				: altpll with (
+						pll_type = "enhanced",
+						operation_mode = "normal",
+						inclk0_input_frequency = 20000,		-- 20000ps = 50MHz
+						clk0_multiply_by = 16,
+						clk0_divide_by = 5);
+
+	clkgen			: tim;
+
+	core			: dig;
+
+	nres			: dffe;
+
+	pin		[31..0]	: tri;
+
+begin
+
+	-- clocks
+
+	pll.inclk[]		= (gnd, clock_50);
+
+	clkgen.clk		= pll.clk[0];
+	clkgen.res		= !inp_resn;
+	clkgen.cfg[]	= core.cfg[6..0];
+
+	core.clk_pll	= clkgen.clk_pll;
+	core.clk_cog	= clkgen.clk_cog;
+
+
+	-- reset
+
+	nres.clk		= clkgen.clk_cog;
+	nres.d			= inp_resn & !core.cfg[7];
+
+	core.nres		= nres.q;
+
+
+	-- pins
+
+	core.pin_in[]	= io[];
+
+	pin[].in		= core.pin_out[];
+	pin[].oe		= core.pin_dir[];
+	
+	io[]			= pin[].out;
+
+
+	-- cog leds
+
+	ledg[]			= core.cog_led[];
+
+end;
