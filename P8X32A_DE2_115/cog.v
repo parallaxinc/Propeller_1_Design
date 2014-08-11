@@ -209,7 +209,7 @@ reg [27:0] ptr;
 
 always @(posedge clk_cog or negedge nres)
 if (!nres)
-	ptr <= 27'b00000000000000_11111000000000;
+	ptr <= 28'b00000000000000_11111000000000;
 else if (ena_bus && ptr_w)
 	ptr <= ptr_d;
 
@@ -334,8 +334,10 @@ always @(posedge clk_cog)
 if (setouta)
 	outa <= alu_r;
 
-always @(posedge clk_cog)
-if (setdira)
+always @(posedge clk_cog or negedge ena)
+if (!ena)
+	dira <= 32'b0;
+else if (setdira)
 	dira <= alu_r;
 
 
