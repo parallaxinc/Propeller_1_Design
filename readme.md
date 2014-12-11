@@ -18,7 +18,7 @@ All files provided are Copyright 2014 Parallax Inc. and distributed under the GN
 Supported FPGA Boards
 ---------------------
 
-The Propeller 1 Design files are structured to run on the [Terasic DE2­115](http://www.parallax.com/product/60050), the [Terasic DE0­Nano](http://www.parallax.com/product/60056), and the Arrow BeMicro CV development boards.
+The Propeller 1 Design files are structured to run on the [Terasic DE2-115](http://www.parallax.com/product/60050), the [Terasic DE0-Nano](http://www.parallax.com/product/60056), and the Arrow BeMicro CV development boards.
 
 Project Structure
 -----------------
