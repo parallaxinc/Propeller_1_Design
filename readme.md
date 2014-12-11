@@ -40,6 +40,5 @@ Tools | Options... | Text Editor
 Revision Notes
 --------------
 
-08/11/2014 - Fixed bug in reset for dira register (cog.v).
-             Added support for the BeMicroCV board.
-08/06/2014 - First public release.
+* 08/11/2014 - Fixed bug in reset for dira register (cog.v). Added support for the BeMicroCV board.
+* 08/06/2014 - First public release.
