@@ -21,4 +21,4 @@
 -- Created on Fri Aug 01 00:40:01 2014
 
 FUNCTION tim (clk, res, cfg[6..0])
-	RETURNS (clk_pll, clk_cog);
+    RETURNS (clk_pll, clk_cog);

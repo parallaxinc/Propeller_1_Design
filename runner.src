@@ -30,12 +30,12 @@
 '
 CON
 
-  #5, masklong, masktop, maskwr				'constants
-  lsb, id, dcall, pbase, vbase, dbase, pcurr, dcurr	'variables
+  #5, masklong, masktop, maskwr                         'constants
+  lsb, id, dcall, pbase, vbase, dbase, pcurr, dcurr     'variables
 
-  stack = masklong	'$FFFFFFFF			'aliases
-  subid = masktop	'$80000000
-  parms = maskwr	'$00800000
+  stack = masklong      '$FFFFFFFF                      'aliases
+  subid = masktop       '$80000000
+  parms = maskwr        '$00800000
   psave = lsb
 
   regop = $3F, r = $80, w = $A0, o = $C0
@@ -47,85 +47,85 @@ CON
 '
 DAT
 
-first	byte	regop, w + stack		'pop and write stack (entry)
-	byte	regop, o + subid, $80		'pop and write subid (leave on stack)
+first   byte    regop, w + stack                'pop and write stack (entry)
+        byte    regop, o + subid, $80           'pop and write subid (leave on stack)
 
-	byte	$38, 8, $E2, $38, 2, $E3	'parms := subid >> 8 << 2
-	byte	regop, w + parms
+        byte    $38, 8, $E2, $38, 2, $E3        'parms := subid >> 8 << 2
+        byte    regop, w + parms
 
-	byte	regop, r + subid		'subid := @pbase.long[subid & $FF]
-	byte	$38, $FF, $E8, $D7, $00
-	byte	regop, w + subid
+        byte    regop, r + subid                'subid := @pbase.long[subid & $FF]
+        byte    $38, $FF, $E8, $D7, $00
+        byte    regop, w + subid
 
-	byte	regop, r + stack, $38, 12, $EC	'bytemove(stack + 12, dcurr - 4 - parms, parms)
-	byte	regop, r + dcurr
-	byte	$38, 4, $ED
-	byte	regop, r + parms, $ED
-	byte	regop, r + parms, $1C
+        byte    regop, r + stack, $38, 12, $EC  'bytemove(stack + 12, dcurr - 4 - parms, parms)
+        byte    regop, r + dcurr
+        byte    $38, 4, $ED
+        byte    regop, r + parms, $ED
+        byte    regop, r + parms, $1C
 
-	byte	regop, r + parms, $14		'pop(parms)
+        byte    regop, r + parms, $14           'pop(parms)
 
-	byte	$34				'long[stack] := $FFFFFFFF
-	byte	regop, r + stack, $C1
+        byte    $34                             'long[stack] := $FFFFFFFF
+        byte    regop, r + stack, $C1
 
-	byte	$3B, $FF, $F9, $FF, $FF		'long[stack][1] := $FFF9FFFF
-	byte	regop, r + stack, $36, $D1
+        byte    $3B, $FF, $F9, $FF, $FF         'long[stack][1] := $FFF9FFFF
+        byte    regop, r + stack, $36, $D1
 
-	byte	$35				'long[stack][2] := 0
-	byte	regop, r + stack, $38, 2, $D1
+        byte    $35                             'long[stack][2] := 0
+        byte    regop, r + stack, $38, 2, $D1
 
-	byte	regop, r + stack, $38, 12, $EC	'parms += stack + 12
-	byte	regop, o + parms, $4C
+        byte    regop, r + stack, $38, 12, $EC  'parms += stack + 12
+        byte    regop, o + parms, $4C
 
-	byte	regop, r + pbase		'word[parms][1] := pbase
-	byte	regop, r + parms, $36, $B1
+        byte    regop, r + pbase                'word[parms][1] := pbase
+        byte    regop, r + parms, $36, $B1
 
-	byte	regop, r + vbase		'word[parms][2] := vbase
-	byte	regop, r + parms, $38, 2, $B1
+        byte    regop, r + vbase                'word[parms][2] := vbase
+        byte    regop, r + parms, $38, 2, $B1
 
-	byte	regop, r + stack, $38, 8, $EC	'word[parms][3] := stack + 8
-	byte	regop, r + parms, $38, 3, $B1
+        byte    regop, r + stack, $38, 8, $EC   'word[parms][3] := stack + 8
+        byte    regop, r + parms, $38, 3, $B1
 
-	byte	regop, r + subid, $A0, $97, $00	'word[parms][4] := @pbase.byte[word[subid]]
-	byte	regop, r + parms, $38, 4, $B1
+        byte    regop, r + subid, $A0, $97, $00 'word[parms][4] := @pbase.byte[word[subid]]
+        byte    regop, r + parms, $38, 4, $B1
 
-	byte	regop, r + subid, $36, $B0	'word[parms][5] := parms + word[subid][1]
-	byte	regop, r + parms, $EC
-	byte	regop, r + parms, $38, 5, $B1
+        byte    regop, r + subid, $36, $B0      'word[parms][5] := parms + word[subid][1]
+        byte    regop, r + parms, $EC
+        byte    regop, r + parms, $38, 5, $B1
 
-	byte	$34				'push params for coginit(-1, interp, parms)
-	byte	$39, interp >> 8, interp
-	byte	regop, r + parms
+        byte    $34                             'push params for coginit(-1, interp, parms)
+        byte    $39, interp >> 8, interp
+        byte    regop, r + parms
 
-	byte	regop, r + psave		'push psave
+        byte    regop, r + psave                'push psave
 
-	byte	$34				'restore masklong to $FFFFFFFF
-	byte	regop, w + masklong
+        byte    $34                             'restore masklong to $FFFFFFFF
+        byte    regop, w + masklong
 
-	byte	$37, $1E			'restore masktop to $80000000
-	byte	regop, w + masktop
+        byte    $37, $1E                        'restore masktop to $80000000
+        byte    regop, w + masktop
 
-	byte	$37, $16			'restore maskwr to $00800000
-	byte	regop, w + maskwr
+        byte    $37, $16                        'restore maskwr to $00800000
+        byte    regop, w + maskwr
 
-	byte	regop, w + pcurr		'pop and write pcurr (return to caller)
+        byte    regop, w + pcurr                'pop and write pcurr (return to caller)
 '
 '
 ' Position stop code and entry code
 '
-	long
-	byte	0
+        long
+        byte    0
 '
 '
 ' Stop code at $FFF9
 '
-	byte	regop, r + id, $21		'cogstop(cogid)
+        byte    regop, r + id, $21              'cogstop(cogid)
 '
 '
 ' Entry code at $FFFC
 '
-	byte	$04				'jmp start
-	byte	(@first - @last) >> 8
-	byte	@first - @last
+        byte    $04                             'jmp start
+        byte    (@first - @last) >> 8
+        byte    @first - @last
 
-last	byte	$01				'chip version
+last    byte    $01                             'chip version

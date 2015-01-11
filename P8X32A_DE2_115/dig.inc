@@ -21,4 +21,4 @@
 -- Created on Fri Aug 01 00:24:11 2014
 
 FUNCTION dig (nres, clk_cog, clk_pll, pin_in[31..0])
-	RETURNS (cfg[7..0], pin_out[31..0], pin_dir[31..0], cog_led[7..0]);
+    RETURNS (cfg[7..0], pin_out[31..0], pin_dir[31..0], cog_led[7..0]);
