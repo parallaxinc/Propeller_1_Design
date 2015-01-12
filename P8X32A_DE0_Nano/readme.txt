@@ -9,12 +9,13 @@ To compile the P8X32A hardware description and load it into the DE0-Nano:
 
 1) Open Quartus II
 2) File | Open Project...
-3) Select 'top' file from this directory
+3) Select 'P1V_Altera.qpf' file from the HDL directory
+3a) Click Project | Revisions, and make sure the DE0-Nano revision is the current revision. If not, click on it, then click Set Current. Click OK to close the dialog.
 4) Press the 'play' button to start compilation (takes several minutes)
 
 5) File | Convert Programming Files
 6) Click 'Open Conversion Setup Data...'
-7) Select 'P8X32A_DE0_Nano.cof' file
+7) Select 'DE0-Nano.cof' file
 8) Click 'Generate'
 
 9) Tools | Programmer
@@ -24,7 +25,7 @@ To compile the P8X32A hardware description and load it into the DE0-Nano:
 13) Set 'Mode:' to 'JTAG'
 14) Click 'Delete' to clear any files or devices
 15) Click 'Add File'
-16) Select 'P8X32A_DE0_Nano.jic' file
+16) Select 'DE0-Nano.jic' file from the output_files directory
 17) Check 'Program/Configure' box
 18) Click 'Start' to begin programming (takes a few minutes)
 

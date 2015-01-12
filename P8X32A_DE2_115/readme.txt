@@ -9,12 +9,13 @@ To compile the P8X32A hardware description and load it into the DE2-115:
 
 1) Open Quartus II
 2) File | Open Project...
-3) Select 'top' file from this directory
+3) Select 'P1V_Altera.qpf' file from the HDL directory
+3a) Click Project | Revisions, and make sure the DE2-115 revision is the current revision. If not, click on it, then click Set Current. Click OK to close the dialog.
 4) Press the 'play' button to start compilation (takes several minutes)
 
 5) File | Convert Programming Files
 6) Click 'Open Conversion Setup Data...'
-7) Select 'P8X32A_DE2_115.cof' file
+7) Select 'DE2-115.cof' file
 8) Click 'Generate'
 
 9) Tools | Programmer
@@ -26,7 +27,7 @@ To compile the P8X32A hardware description and load it into the DE2-115:
 15) Set 'Mode:' to 'Active Serial Programming'
 16) Click 'Delete' to clear any files or devices
 17) Click 'Add File'
-18) Select 'P8X32A_DE2_115.pof' file
+18) Select 'DE2-115.pof' file from the output_files directory
 19) Check 'Program/Configure' box
 20) Click 'Start' to begin programming (takes a few minutes)
 
