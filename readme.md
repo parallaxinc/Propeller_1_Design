@@ -18,27 +18,44 @@ All files provided are Copyright 2014 Parallax Inc. and distributed under the GN
 Supported FPGA Boards
 ---------------------
 
-The Propeller 1 Design files are structured to run on the [Terasic DE2-115](http://www.parallax.com/product/60050), the [Terasic DE0-Nano](http://www.parallax.com/product/60056), and the Arrow BeMicro CV development boards.
+The Propeller 1 Design files are structured to run on the following development boards:
+
+* [Terasic DE2-115](http://www.parallax.com/product/60050) (Altera Cyclone IV)
+* [Terasic DE0-Nano](http://www.parallax.com/product/60056) (Altera Cyclone IV)
+* [Arrow BeMicro CV](https://parts.arrow.com/item/detail/arrow-development-tools/bemicrocv) (Altera Cyclone V)
+
+Other target systems will be added soon, including Xilinx FPGAs!
 
 Project Structure
 -----------------
 
-There are three sub-directories in this repository: one for the DE2-115, one for the DE0-Nano, and one for the BeMicroCV. They each contain an identical set of Verilog and AHDL files, along with unique .qsf and .cof files to differentiate the pinouts and programming images for the three different FPGA boards.
+The HDL directory contains all the files you need to turn your supported FPGA board into a Propeller. All targets use the same files, but you have to follow different instructions depending on your hardware. Please go to the directory that's appropriate for your board and follow the instructions there. Note, the PDF files in some directories may be somewhat outdated because it's harder to edit PDF files than text files. The readme.txt files should be the most accurate.
 
-To compile for an FPGA board, go into the appropriate directory and follow the instructions in the readme or setup file. After compilation and download, the FPGA board will behave like a P8X32A Propeller chip, according to the pinout shown in the .png file. The emulated P8X32A chip will behave as if a 5MHz input is fed into the XI pin. This allows normal 80MHz operation when PLL16X is used. You can program the 'chip' via any Propeller development software (like Propeller Tool, PropellerIDE, or SimpleIDE) by plugging a [Prop Plug](http://www.parallax.com/product/32201) into the pins outlined in the .png file.
+By default, the emulated P8X32A will behave exactly like a real Propeller chip with a 5MHz crystal connected to the XI pin. This allows normal 80MHz operation when PLL16X is used. You can program the 'chip' via any Propeller development software (like Propeller Tool, PropellerIDE, or SimpleIDE) by plugging a [Prop Plug](http://www.parallax.com/product/32201) into the pins outlined in the .png file. On most FPGA boards, there is not enough EEPROM space available to use the "Download to EEPROM" option from the various Propeller tools, so you'll have to run your Propeller program from the internal RAM; instructions on how to modify FPGA boards to install a bigger EEPROM chip will be posted in the Wiki.
 
-The root directory contains the original .src files for the code in the P8X32A's ROM. You must rename them to .spin files and put a 'PUB anyname' at their top before compiling them. They are not directly executable, but are provided to show you what went into the ROM:
+The Spin directory contains the original source files for the code in the P8X32A's ROM. They were created with an early version of the development tools, so they might not compile correctly. For example, you will have to put a 'PUB anyname' at the top before compiling some of the files. They are not directly executable, but are provided to show you what went into the ROM:
 
-* interpreter.src - begins at $F004
-* booter.src - begins at $F800
-* runner.src - butts up against $FFFF
+* interpreter.spin - begins at $F004
+* booter.spin - begins at $F800
+* runner.spin - butts up against $FFFF
 
-To properly view the Verilog and AHDL source files, be sure to set the tab size to 4 spaces in Quartus II via:
+Another file in that directory called cogledtest.spin can be downloaded to the FPGA to verify that the Propeller is working: it simply starts all cogs in succession so you should see the LEDs on your board light up one by one.
 
-Tools | Options... | Text Editor
+Submitting changes
+------------------
+
+Everyone is invited to use the sources in whichever way they see fit. If you want to build your own project based on an FPGA that runs this code with or without your modifications, you're free to do so. However, if you're going to make your project available to others, you should follow the rules of the GPL: you should make the source code available to the people to whom you distribute your project.
+
+The easiest way to make your changes available and to make it easy for yourself to integrate awesome changes that others have made, is to fork the Github repository and make your changes in your fork. Others can then make their own forks off your project. But to maintain a minimum amount of order, let's define some rules:
+
+* The "master" branch will/should always generate a Propeller emulator that's as close to the original functionality of the Propeller (running at 5MHz extern, 80MHz intern with PLL16X) as possible. The internal architecture will match the Propeller as much as possible too. Any deficiencies where the emulation can't match the original must be documented; for example the DE0-Nano doesn't emulate the character ROM area in the hub.
+* All source files should be de-tabbed (i.e. contain only spaces, not tab characters). Tabs date from a time when printers were slow, memories were small and mass storage was expensive. In the 21st century they'r only a source of disagreement, so we don't use them. All tabs from the original 2014 distribution from Parallax have been eliminated, and you should not introduce any new ones. To make sure that you don't, make sure your editor settings are correct before you make any changes. For example in the Altera Quartus II tool, open any source file and click on the Tools | Options | Text Editor menu. Make sure that "Insert Space on Tab" is enabled. The "Tab Size (in Spaces)" should be set to 4.
+* When you submit your files to Github, make sure that no unnecessary files are checked in. We try to maintain a .gitignore file to prevent unneeded files from ending up in source control, but this rule also applies to changes that are automatically entered into the files by the tools. For example, if you only install support for the Cyclone IV in Quartus because you own Cyclone IV based hardware, that's okay, but the program will automatically convert the Cyclone V projects to a Cyclone IV project and if you allow Github to store this change, your build will work fine but others won't be able to build the project for their hardware anymore. Please review your changes before you check them in. The [Github tool for Windows](https://windows.github.com/) is adequate, but there are other tools available that (arguably) do a better job of letting you review your changes, such as [GitExtensions](http://sourceforge.net/projects/gitextensions/).
+* [The Parallax forums](http://forums.parallax.com/forumdisplay.php/101) where this project originates, are a friendly place where everyone respects each other. The Github maintainers will continue this great tradition here. While most of the developers in the P1V community may work with Windows, we don't want to discriminate against those who use Linux or OS/X, so you should avoid using any tools that can't be used on other operating systems besides the one you're using. Also, while English is spoken here, you should keep in mind that not everyone is in the USA, so we should avoid confusion with international issues like date/time formats.
 
 Revision Notes
 --------------
 
-* 08/11/2014 - Fixed bug in reset for dira register (cog.v). Added support for the BeMicroCV board.
-* 08/06/2014 - First public release.
+* 2015-01-13 - (Jac Goudsmit) De-tabbed all source files, merged all sources into one directory to reduce maintenance effort, updated documentation.
+* 2014-08-11 - (Parallax) Fixed bug in reset for dira register (cog.v). Added support for the BeMicroCV board.
+* 2014-08-06 - (Parallax) First public release.
