@@ -111,7 +111,7 @@ assign pin_out      = outb << ctr[13:9] | outa << ctr[4:0];
 reg [35:0] pll_fake;
 
 always @(posedge clk_pll)
-if (~&ctr[30:28] && |ctr[27:26])
+if (~|ctr[30:28] && |ctr[27:26])
     pll_fake <= pll_fake + {4'b0, frq};
 
 wire [7:0] pll_taps = pll_fake[35:28];
