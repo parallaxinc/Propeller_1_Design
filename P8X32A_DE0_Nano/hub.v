@@ -137,6 +137,10 @@ if (ena_bus)
 
 // set bus output according to cog[n-2]
 
+reg [2:0] sys_q;
+reg sys_c;
+
+
 wire [31:0] ramq	= !rd ? mem_q : {mem_q[03], mem_q[07], mem_q[21], mem_q[12],	// unscramble rom data if cog loading
 								 	 mem_q[06], mem_q[19], mem_q[04], mem_q[17],
 									 mem_q[20], mem_q[15], mem_q[08], mem_q[11],
@@ -173,6 +177,9 @@ assign bus_ack		= ed ? {bus_sel[1:0], bus_sel[7:2]} : 8'b0;
 //	110		LOCKSET		-,id(3)				id(3)			id(3)			lock_state[id(3)]
 //	111		LOCKCLR		-,id(3)				id(3)			id(3)			lock_state[id(3)]
 
+reg [7:0] cog_e;
+reg [7:0] lock_e;
+
 wire sys			= ec && (&sc);
 
 wire [7:0] enc		= ac[2] ? lock_e : cog_e;
@@ -204,8 +211,6 @@ else if (ena_bus && sys && ac[2:0] == 3'b000)
 
 // cogs
 
-reg [7:0] cog_e;
-
 wire cog_start		= sys && ac[2:0] == 3'b010 && !(dc[3] && all);
 
 always @(posedge clk_cog or negedge nres)
@@ -227,7 +232,6 @@ assign ptr_d		= dc[31:4];
 
 // locks
 
-reg [7:0] lock_e;
 reg [7:0] lock_state;
 
 always @(posedge clk_cog or negedge nres)
@@ -244,9 +248,6 @@ wire lock_mux		= lock_state[dc[2:0]];
 
 
 // output
-
-reg [2:0] sys_q;
-reg sys_c;
 
 always @(posedge clk_cog)
 if (ena_bus && sys)

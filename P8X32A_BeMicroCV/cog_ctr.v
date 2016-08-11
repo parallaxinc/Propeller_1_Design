@@ -59,10 +59,6 @@ always @(posedge clk_cog)
 if (setfrq)
 	frq <= data;
 
-always @(posedge clk_cog)
-if (setphs || trig)
-	phs <= setphs ? {1'b0, data} : {1'b0, phs[31:0]} + {1'b0, frq};
-
 
 // input pins
 
@@ -73,7 +69,7 @@ if (|ctr[30:29])
 	dly <= {ctr[30] ? pin_in[ctr[13:9]] : dly[0], pin_in[ctr[4:0]]};
 
 
-// trigger, outputs
+// trigger, outputs, phase
 
 					//	trigger			outb		outa
 wire [15:0][2:0] tp	= {	dly == 2'b10,	!dly[0],	1'b0,		// neg edge w/feedback
@@ -99,6 +95,10 @@ wire [2:0] tba		= tp[pick];
 wire trig			= ctr[30] ? pick[dly]	: tba[2];		// trigger
 wire outb			= ctr[30] ? 1'b0		: tba[1];		// outb
 wire outa			= ctr[30] ? 1'b0		: tba[0];		// outa
+
+always @(posedge clk_cog)
+if (setphs || trig)
+	phs <= setphs ? {1'b0, data} : {1'b0, phs[31:0]} + {1'b0, frq};
 
 
 // output pins

@@ -214,20 +214,11 @@ else if (ena_bus && ptr_w)
 	ptr <= ptr_d;
 
 
-// load/run
-
-reg run;
-
-always @(posedge clk_cog or negedge ena)
-if (!ena)
-	run <= 1'b0;
-else if (m[3] && (&px))
-	run <= 1'b1;
-
-
 // state
 
 reg [4:0] m;
+
+wire waiti;
 
 always @(posedge clk_cog or negedge ena)
 if (!ena)
@@ -240,11 +231,30 @@ else
 		   !m[4] && !m[2] && !m[1] && !m[0] };		// m[0] = read s
 
 
+// load/run
+
+reg run;
+
+wire [8:0] px;
+
+always @(posedge clk_cog or negedge ena)
+if (!ena)
+	run <= 1'b0;
+else if (m[3] && (&px))
+	run <= 1'b1;
+
+
 // process
 
 reg [8:0] p;
 reg c;
 reg z;
+
+wire [31:0] i;
+wire cond;
+wire jump_cancel;
+wire alu_co;
+wire alu_zo;
 
 always @(posedge clk_cog or negedge ena)
 if (!ena)
@@ -306,6 +316,8 @@ wire setscl			= wio && i[dl+3:dl] == 4'hF;
 
 
 // register ram
+
+wire alu_wr;
 
 wire ram_ena		= m[0] || m[1] || m[2] || m[3] && cond && i[wr];
 
@@ -405,7 +417,7 @@ always @(posedge clk_cog)
 if (m[3])
 	ix <= ram_q;
 
-wire [31:0] i		= run ? ix : {14'b000010_001_0_0001, p, 9'b000000000};
+assign i			= run ? ix : {14'b000010_001_0_0001, p, 9'b000000000};
 
 
 // source
@@ -442,14 +454,14 @@ if (m[2])
 
 // condition
 
+reg cancel;
+
 wire [3:0] condx	= i[ch:cl];
 
-wire cond			= condx[{c, z}] && !cancel;
+assign cond			= condx[{c, z}] && !cancel;
 
 
 // jump/next
-
-reg cancel;
 
 wire dz				= ~|d[31:1];
 
@@ -460,9 +472,9 @@ wire [1:0] jumpx	= i[oh:ol] == 6'b010111		? {1'b1, 1'b0}				// retjmp
 												: {1'b0, 1'b0};				// no jump
 
 wire jump			= jumpx[1];
-wire jump_cancel	= jumpx[0];
+assign jump_cancel	= jumpx[0];
 
-wire [8:0] px		= cond && jump ? sx[8:0] : p;
+assign px			= cond && jump ? sx[8:0] : p;
 
 always @(posedge clk_cog or negedge ena)
 if (!ena)
@@ -483,10 +495,7 @@ assign bus_d		= !bus_sel ? 32'b0	: d;
 
 // alu interface
 
-wire alu_wr;
 wire [31:0] alu_r;
-wire alu_co;
-wire alu_zo;
 
 cog_alu cog_alu_  (	.i		(i[oh:ol]),
 					.s		(s),
@@ -519,7 +528,7 @@ wire waitx			= i[oh:ol+2] == 4'b0000__	? !bus_ack
 					: i[oh:ol+0] == 6'b111111	? !vidack
 												: 1'b0;
 
-wire waiti			= cond && waitx;
+assign waiti		= cond && waitx;
 
 
 // pins
